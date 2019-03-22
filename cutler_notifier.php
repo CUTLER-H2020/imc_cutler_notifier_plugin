@@ -79,34 +79,30 @@ class plgImccutler_notifier extends JPlugin
 		$details = $this->getDetails($id, $model);
 		$showMsgsBackend  = ($this->params->get('messagesbackend') && $app->isAdmin());
 
-		//Prepare email for admins
 		if ($this->params->get('cutlermoderationchange')) {
 			if($showMsgsBackend) {
 				$app->enqueueMessage("CUTLER plugin is triggered because moderation is changed");
 			}
 
-			//send data to CUTLER
-			$dummy = array(
-				'username' => 'MyUsername',
-				'password' => 'MyPassword'
-			);	
-			$jsonData = json_encode($dummy);
-
-			$result = $this->sendData( $jsonData );
+			$result = $this->sendData( $validData );
 			$app->enqueueMessage( serialize($result) );
 		}
 
 	}
 
-	private function sendData( $jsonData )
+	private function sendData( $data )
 	{
 		$app = JFactory::getApplication();
 		$url = $this->params->get('cutler_url');
 		$port = $this->params->get('cutler_port', 80);
 		
+		$jsonData = json_encode($data);
+
 		try {
 			$ch = curl_init($url);
-			curl_setopt($ch, CURLOPT_PORT, $port);
+			if($port != 80) {
+				curl_setopt($ch, CURLOPT_PORT, $port);
+			}
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
@@ -136,13 +132,11 @@ class plgImccutler_notifier extends JPlugin
 	private function getDetails($id, $model) 
 	{
 		$issueid = $id;
-		//check if issue added from frontend
 		if($id == null){
 			$issueid = $model->getItem()->get('id');
 		} 
 
 		require_once JPATH_COMPONENT_ADMINISTRATOR . '/models/issue.php';
-		//JModelLegacy::addIncludePath(JPATH_COMPONENT_ADMINISTRATOR . '/models');
 		$issueModel = JModelLegacy::getInstance( 'Issue', 'ImcModel' );
 
 		$item = $issueModel->getItem($issueid);
