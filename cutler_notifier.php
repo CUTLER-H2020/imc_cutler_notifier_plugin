@@ -93,6 +93,7 @@ class plgImccutler_notifier extends JPlugin
 			$jsonData = json_encode($dummy);
 
 			$result = $this->sendData( $jsonData );
+			$app->enqueueMessage( serialize($result) );
 		}
 
 	}
@@ -101,9 +102,11 @@ class plgImccutler_notifier extends JPlugin
 	{
 		$app = JFactory::getApplication();
 		$url = $this->params->get('cutler_url');
+		$port = $this->params->get('cutler_port', 80);
 		
 		try {
 			$ch = curl_init($url);
+			curl_setopt($ch, CURLOPT_PORT, $port);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
 			curl_setopt($ch, CURLOPT_POST, 1);
 			curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
@@ -117,13 +120,13 @@ class plgImccutler_notifier extends JPlugin
 				$app->enqueueMessage("CUTLER: Empty or no JSON result", 'error');
 			}
 			if(isset($result->error)){
-				$app->enqueueMessage("CUTLER: Result returned error code: ". $result->error, 'error');
+				$app->enqueueMessage("CUTLER: Result returned error code: ". serialize($result), 'error');
 			}
 			
 			$result = json_decode($output);
 		}
 		catch(Exception $e)	{
-			$app->enqueueMessage("CUTLER: Exception occured: ". $e, 'error');
+			$app->enqueueMessage("CUTLER: Exception occured: ", 'error');
 			$result = null;
 		}
 		return $result;
