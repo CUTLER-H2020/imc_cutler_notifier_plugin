@@ -19,3 +19,6 @@
 ## Usage
 Once the extension has been activated, it is working automatically with no intervention needed.
 To stop the extension just disable it from the backend of your Joomla site.
+
+## Development
+This extension is written in PHP so you can start developing using your favourite development environment.
