@@ -1,5 +1,5 @@
 # imc_cutler_notifier_plugin
-> This is a Joomla extension that can be installed on any ImproveMyCity Joomla Installation.
+> This is a Joomla extension that can be installed on any [ImproveMyCity Joomla Installation](https://github.com/itsam/imc).
 > It listens to specific events of the ImproveMyCity platform, and sends data about each event to the CUTLER platform.
 
 ## Installation
